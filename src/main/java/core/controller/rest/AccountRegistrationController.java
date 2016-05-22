@@ -1,19 +1,19 @@
 package core.controller.rest;
 
-import core.repository.model.Account;
-import core.repository.model.PasswordResetToken;
-import core.repository.model.VerificationToken;
-import core.repository.model.form.RegistrationForm;
-import core.repository.model.form.RequestResetPasswordForm;
-import core.repository.model.form.ResendEmailForm;
-import core.repository.model.form.ResetPasswordForm;
-import core.repository.service.AccountService;
-import core.repository.service.EmailService;
-import core.repository.service.event.OnRegistrationCompleteEvent;
-import core.repository.service.event.OnResendEmailEvent;
-import core.repository.service.event.OnResetPasswordEvent;
-import core.repository.service.exception.EmailExistsException;
-import core.repository.service.exception.EmailNotSentException;
+import core.model.Account;
+import core.model.PasswordResetToken;
+import core.model.VerificationToken;
+import core.model.form.RegistrationForm;
+import core.model.form.RequestResetPasswordForm;
+import core.model.form.ResendEmailForm;
+import core.model.form.ResetPasswordForm;
+import core.service.AccountService;
+import core.service.EmailService;
+import core.service.event.OnRegistrationCompleteEvent;
+import core.service.event.OnResendEmailEvent;
+import core.service.event.OnResetPasswordEvent;
+import core.service.exception.EmailExistsException;
+import core.service.exception.EmailNotSentException;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -29,7 +29,6 @@ import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.xml.ws.Response;
 import java.util.Calendar;
 
 /**

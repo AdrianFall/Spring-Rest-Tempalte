@@ -1,8 +1,8 @@
 package core.security.service;
 
-import core.repository.AccountRepo;
-import core.repository.model.Account;
-import core.repository.model.Role;
+import core.dao.AccountDao;
+import core.model.Account;
+import core.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,7 +23,7 @@ import java.util.Set;
 public class UserDetailsServiceImpl implements org.springframework.security.core.userdetails.UserDetailsService {
 
     @Autowired
-    private AccountRepo accountRepository;
+    private AccountDao accountRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

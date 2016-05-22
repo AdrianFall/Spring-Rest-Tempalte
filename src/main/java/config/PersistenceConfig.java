@@ -22,7 +22,7 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @PropertySource({ "classpath:properties/persistence.properties" })
-@ComponentScan({ "core.repository.impl.hibernate", "core.repository.service" })
+@ComponentScan({"core.dao.impl", "core.service"})
 public class PersistenceConfig {
     @Autowired
     private Environment env;
@@ -50,7 +50,7 @@ public class PersistenceConfig {
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan(new String[]{"core.repository.model"});
+        sessionFactory.setPackagesToScan(new String[]{"core.model"});
         sessionFactory.setHibernateProperties(hibernateProperties());
 
         return sessionFactory;
@@ -75,8 +75,6 @@ public class PersistenceConfig {
             {
                 setProperty("hibernate.order_inserts", env.getProperty("hibernate.order_inserts"));
                 setProperty("hibernate.order_updates", env.getProperty("hibernate.order_updates"));
-
-
 
                 setProperty("hibernate.jdbc.batch_size", env.getProperty("hibernate.jdbc.batch_size"));
                 setProperty("hibernate.validator.apply_to_ddl", env.getProperty("hibernate.validator.apply_to_ddl"));

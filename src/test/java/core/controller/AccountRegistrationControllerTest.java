@@ -4,10 +4,10 @@ import config.PersistenceConfig;
 import config.SpringConfig;
 import config.WebConfig;
 import config.WebSecurityConfig;
-import core.repository.model.Account;
-import core.repository.model.PasswordResetToken;
-import core.repository.model.VerificationToken;
-import core.repository.service.AccountService;
+import core.model.Account;
+import core.model.PasswordResetToken;
+import core.model.VerificationToken;
+import core.service.AccountService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
@@ -39,7 +39,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**

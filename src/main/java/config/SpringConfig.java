@@ -34,6 +34,7 @@ public class SpringConfig {
         return messageSource;
     }
 
+    /*https://www.google.com/settings/u/2/security/lesssecureapps*/
     @Bean
     public JavaMailSender mailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();

@@ -1,25 +1,12 @@
 package core.controller.rest;
 
-import core.repository.model.Account;
-import core.repository.model.form.RegistrationForm;
-import core.repository.service.AccountService;
-import core.repository.service.EmailService;
-import core.repository.service.event.OnRegistrationCompleteEvent;
-import core.repository.service.exception.EmailExistsException;
-import core.repository.service.exception.EmailNotSentException;
+import core.service.AccountService;
+import core.service.EmailService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.security.Principal;
 
 /**
