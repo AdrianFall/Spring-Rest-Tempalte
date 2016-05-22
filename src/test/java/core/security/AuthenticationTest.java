@@ -61,12 +61,4 @@ public class AuthenticationTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @Test
-    public void validLoginTest() throws Exception {
-        mockMvc.perform(get("/api/user").with(httpBasic(VALID_EMAIL, VALID_PASSWORD)))
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andReturn();
-    }
-
 }

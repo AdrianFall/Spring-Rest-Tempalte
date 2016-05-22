@@ -4,6 +4,7 @@ import config.PersistenceConfig;
 import config.SpringConfig;
 import config.WebConfig;
 import config.WebSecurityConfig;
+import core.TestBase;
 import core.model.Account;
 import core.model.PasswordResetToken;
 import core.model.VerificationToken;
@@ -48,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {PersistenceConfig.class, WebSecurityConfig.class, SpringConfig.class, WebConfig.class}, loader = AnnotationConfigWebContextLoader.class)
 @Transactional
 @WebAppConfiguration
-public class AccountRegistrationControllerTest {
+public class AccountRegistrationControllerTest extends TestBase {
 
     public static final String VALID_EMAIL = "chupa@ca.bra";
     public static final String VALID_PASSWORD = "chup4c4br4";
@@ -80,10 +81,8 @@ public class AccountRegistrationControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotAcceptable())
                 .andReturn();
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("emailError"));
@@ -98,10 +97,8 @@ public class AccountRegistrationControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         // Make sure the response body contains email
@@ -114,7 +111,24 @@ public class AccountRegistrationControllerTest {
         registerValidAccountTest();
         mockMvc.perform(get("/api/user").with(httpBasic(VALID_EMAIL, VALID_PASSWORD)))
                 .andDo(print())
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized()); // Should be unauthorized because account is not enabled yet
+    }
+
+    @Test
+    public void loginActivatedAccountTest() throws Exception {
+        registrationConfirmWithValidTokenTest();
+
+        MvcResult mvcResult = mockMvc.perform(get("/api/user").with(httpBasic(VALID_EMAIL, VALID_PASSWORD)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        JSONObject o = getJSONFromMVCResult(mvcResult);
+        System.out.println(o.toString());
+        Assert.assertNotNull(o);
+        Assert.assertNotNull(o.get("email"));
+        Assert.assertEquals(o.get("email"), VALID_EMAIL);
+
     }
 
     @Test
@@ -125,17 +139,14 @@ public class AccountRegistrationControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotAcceptable())
                 .andReturn();
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
-        // Make sure the response body contains email
+        // Make sure the response body contains emailError
         Assert.assertNotNull(o.get("emailError"));
         Assert.assertFalse(o.get("emailError").equals(""));
         Assert.assertEquals(o.get("emailError"), messageSource.getMessage("Pattern.email", null, Locale.ENGLISH));
-        //Assert.assertTrue(o.get("emailError").equals("Wrong email format."));
     }
 
     @Test
@@ -147,13 +158,11 @@ public class AccountRegistrationControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotAcceptable())
                 .andReturn();
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
-        // Make sure the response body contains email
+        // Make sure the response body contains passwordErrors
         Assert.assertNotNull(o.get("passwordError"));
         Assert.assertFalse(o.get("passwordError").equals(""));
         Assert.assertNotNull(o.get("confirmPasswordError"));
@@ -162,15 +171,15 @@ public class AccountRegistrationControllerTest {
 
     @Test
     public void registerWithAlreadyTakenEmailTest() throws Exception {
-        String email = "adrianq92@hotmail.com";
-        MvcResult mvcResult = mockMvc.perform(postForm(email, "n3wpassword", "n3wpassword"))
+
+        registerValidAccountTest();
+
+        MvcResult mvcResult = mockMvc.perform(postForm(VALID_EMAIL, "n3wpassword", "n3wpassword"))
                 .andDo(print())
                 .andExpect(status().isNotAcceptable())
                 .andReturn();
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         // Make sure the response body contains email
@@ -201,10 +210,7 @@ public class AccountRegistrationControllerTest {
                 .andReturn();
 
         // Expect the result to have json file with key: tokenError, value: verificationToken.getToken()
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         // Make sure the response body contains tokenError
@@ -248,10 +254,7 @@ public class AccountRegistrationControllerTest {
                 .andReturn();
 
         // Expect the result to have json file with key: tokenError, value: The link has expired, please activate your account with the new link that has been just sent to your email.
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         // Make sure the response body contains tokenError
@@ -287,10 +290,7 @@ public class AccountRegistrationControllerTest {
                 .andReturn();
 
         // Expect the result to have json file with key: token, value: verificationToken.getToken()
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         // Make sure the response body contains token
@@ -303,9 +303,8 @@ public class AccountRegistrationControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andReturn();
-        resposeBody = mvcResult.getResponse().getContentAsString();
-        obj = parser.parse(resposeBody);
-        o = (JSONObject) obj;
+
+        o = getJSONFromMVCResult(mvcResult);
         Assert.assertNotNull(o);
         // Make sure the response body contains email
         Assert.assertEquals(o.get("email"), VALID_EMAIL);
@@ -318,10 +317,7 @@ public class AccountRegistrationControllerTest {
                 .andReturn();
 
         // Expect the result to have json file with key: token, value: verificationToken.getToken()
-        resposeBody = mvcResult.getResponse().getContentAsString();
-        parser = new JSONParser();
-        obj = parser.parse(resposeBody);
-        o = (JSONObject) obj;
+        o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         // Make sure the response body contains token
@@ -357,10 +353,7 @@ public class AccountRegistrationControllerTest {
                 .andReturn();
 
         // Expect message = messageSource.getMessage("resend.email.success", null, request.getLocale())
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("message"));
@@ -389,11 +382,7 @@ public class AccountRegistrationControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("message"));
@@ -417,10 +406,7 @@ public class AccountRegistrationControllerTest {
                 .andExpect(status().isNotAcceptable())
                 .andReturn();
 
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("emailError"));
@@ -441,10 +427,7 @@ public class AccountRegistrationControllerTest {
                 .andExpect(status().isNotAcceptable())
                 .andReturn();
 
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("emailError"));
@@ -483,10 +466,7 @@ public class AccountRegistrationControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("message"));
@@ -513,10 +493,7 @@ public class AccountRegistrationControllerTest {
                 .andExpect(status().isNotAcceptable())
                 .andReturn();
 
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("error"));
@@ -541,10 +518,7 @@ public class AccountRegistrationControllerTest {
                 .andExpect(status().isNotAcceptable())
                 .andReturn();
 
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("error"));
@@ -582,10 +556,7 @@ public class AccountRegistrationControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("message"));
@@ -618,10 +589,7 @@ public class AccountRegistrationControllerTest {
                 .andExpect(status().isNotAcceptable())
                 .andReturn();
 
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("passwordError"));
@@ -648,10 +616,7 @@ public class AccountRegistrationControllerTest {
                 .andExpect(status().isNotAcceptable())
                 .andReturn();
 
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("passwordError"));
@@ -684,10 +649,7 @@ public class AccountRegistrationControllerTest {
                 .andExpect(status().isNotAcceptable())
                 .andReturn();
 
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
+        JSONObject o = getJSONFromMVCResult(mvcResult);
         System.out.println(o.toString());
         Assert.assertNotNull(o);
         Assert.assertNotNull(o.get("error"));
@@ -695,44 +657,5 @@ public class AccountRegistrationControllerTest {
         Assert.assertEquals(o.get("error"), messageSource.getMessage("reset.password.token.invalid", null, Locale.ENGLISH));
 
     }
-/*
-    @Test
-    public void resetPasswordWithValidTokenButInvalidEmailTest() throws Exception {
-        // Expect status 406
-        // Expect "reset.password.error.email"
-
-        requestResetPasswordTest();  // for account with email : VALID_EMAIL
-
-        PasswordResetToken passwordResetToken = accountService.findCurrentPasswordResetTokenOfAccountByEmail(VALID_EMAIL);
-        Assert.assertNotNull(passwordResetToken);
-
-        JSONObject json = new JSONObject();
-        json.put("email", passwordResetToken.getAcc().getEmail() + "appended");
-        json.put("token", passwordResetToken.getToken());
-        json.put("password", "newvalidpassword");
-        json.put("confirmPassword", "newvalidpassword");
-        MvcResult mvcResult = mockMvc.perform(post("/resetPassword")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json.toJSONString()))
-                .andDo(print())
-                .andExpect(status().isNotAcceptable())
-                .andReturn();
-
-        String resposeBody = mvcResult.getResponse().getContentAsString();
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(resposeBody);
-        JSONObject o = (JSONObject) obj;
-        System.out.println(o.toString());
-        Assert.assertNotNull(o);
-        Assert.assertNotNull(o.get("error"));
-        Assert.assertFalse(o.get("error").equals(""));
-        Assert.assertEquals(o.get("error"), messageSource.getMessage("reset.password.error.email", null, Locale.ENGLISH));
-
-    }*/
-
-
-
-
-
 
 }
