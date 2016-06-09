@@ -1,5 +1,8 @@
 package core.security.rest.authentication;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -14,6 +17,9 @@ import java.io.IOException;
  */
 public class RestAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 
+    @Autowired
+    MessageSource messageSource;
+
     @Override
     public void commence(HttpServletRequest req, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) req;
@@ -24,6 +30,9 @@ public class RestAuthenticationEntryPoint extends BasicAuthenticationEntryPoint 
         }
         /*response.addHeader("Access-Control-Allow-Origin", "*");*/
         response.addHeader("WWW-Authenticate", "RestBasic realm=\"" + getRealmName() + "\"");
+        if (authException instanceof DisabledException) {
+           response.setHeader("error", messageSource.getMessage("login.disabled", null, httpRequest.getLocale()));
+        }
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentLength(0);
     }
