@@ -106,12 +106,17 @@ public class AccountRegistrationControllerTest extends TestBase {
     }
 
     @Test
-    public void registerAccountAndAttemptLoginTest() throws Exception {
+    public void registerAccountAndAttemptLoginToDisabledAccountTest() throws Exception {
         // User should not be authenticated before email activation
         registerValidAccountTest();
-        mockMvc.perform(get("/api/user").with(httpBasic(VALID_EMAIL, VALID_PASSWORD)))
+        MvcResult mvcResult = mockMvc.perform(get("/api/user").with(httpBasic(VALID_EMAIL, VALID_PASSWORD)))
                 .andDo(print())
-                .andExpect(status().isUnauthorized()); // Should be unauthorized because account is not enabled yet
+                .andExpect(status().isUnauthorized())
+                .andReturn();// Should be unauthorized because account is not enabled yet
+
+        String errorMessage = mvcResult.getResponse().getHeader("error");
+        Assert.assertNotNull(errorMessage);
+
     }
 
     @Test

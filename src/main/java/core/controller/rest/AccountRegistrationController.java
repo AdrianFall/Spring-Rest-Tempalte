@@ -98,11 +98,12 @@ public class AccountRegistrationController {
             return ResponseEntity.status(406).body(jsonResponse.toJSONString());
         }
 
-        // Proceed to authentication
+        /*// Proceed to authentication
         Authentication auth = new UsernamePasswordAuthenticationToken(acc, null, userDetailsService.loadUserByUsername(acc.getEmail()).getAuthorities());
         System.out.println("Authorities of " + acc.getEmail() + " are : " + auth.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        jsonResponse.put("message", messageSource.getMessage("reset.password.success", null, request.getLocale()));
+        SecurityContextHolder.getContext().setAuthentication(auth);*/
+        jsonResponse.put("message", messageSource.getMessage("reset.password.token.valid", null, request.getLocale()));
+        jsonResponse.put("token", token);
         return ResponseEntity.status(200).body(jsonResponse.toJSONString());
     }
 
