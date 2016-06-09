@@ -116,6 +116,7 @@ public class AccountRegistrationControllerTest extends TestBase {
 
         String errorMessage = mvcResult.getResponse().getHeader("error");
         Assert.assertNotNull(errorMessage);
+        Assert.assertFalse(errorMessage.trim().equals(""));
 
     }
 
