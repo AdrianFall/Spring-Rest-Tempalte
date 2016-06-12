@@ -106,7 +106,7 @@ public class AccountRegistrationControllerTest extends TestBase {
     }
 
     @Test
-    public void registerAccountAndAttemptLoginToDisabledAccountTest() throws Exception {
+    public void registerAccountAndAttemptdToDisabledAccountTest() throws Exception {
         // User should not be authenticated before email activation
         registerValidAccountTest();
         MvcResult mvcResult = mockMvc.perform(get("/api/user").with(httpBasic(VALID_EMAIL, VALID_PASSWORD)))
