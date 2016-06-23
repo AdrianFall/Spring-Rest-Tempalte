@@ -42,9 +42,9 @@ public class AuthenticationTest {
     private WebApplicationContext context;
 
     private MockMvc mockMvc;
-    // part of create-all.sql script where following data is inserted (password with Bcrypt): INSERT INTO account(id, email, password, enabled) VALUES (2, 'adrianq92@hotmail.com', '$2a$10$AK1rKs1jY0W0qjACmoDioO7gzCzJIxAfXDBgOi0gfyYaf.adw8m7y', TRUE);
-    private static final String VALID_EMAIL = "adrianq92@hotmail.com";
-    private static final String VALID_PASSWORD = "adiadi";
+
+    private static final String INVALID_EMAIL = "adrianq92@hotmail.com";
+    private static final String INVALID_PASSWORD = "adiadi";
 
     @Before
     public void setup() throws Exception{
@@ -57,7 +57,7 @@ public class AuthenticationTest {
 
     @Test
     public void invalidLoginTest() throws Exception {
-        mockMvc.perform(get("/api/user").with(httpBasic(VALID_EMAIL, VALID_PASSWORD + "appended")))
+        mockMvc.perform(get("/api/user").with(httpBasic(INVALID_EMAIL, INVALID_PASSWORD + "appended")))
                 .andExpect(status().isUnauthorized());
     }
 
