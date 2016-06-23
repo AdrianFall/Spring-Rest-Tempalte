@@ -64,9 +64,15 @@ public class AccountDaoImpl implements AccountDao {
                 .createCriteria(Role.class)
                 .add(Restrictions.eq("role", "ROLE_USER"))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).uniqueResult();
-        if (role == null)
-            throw new RuntimeException("ROLE_USER not found. Make sure that one exists in role table.");
-
+        if (role == null) {
+            // Persist the ROLE_USER
+            Role roleUser = new Role("ROLE_USER");
+            sessionFactory.getCurrentSession().save(roleUser);
+            sessionFactory.getCurrentSession().flush();
+            if (roleUser == null || roleUser.getId() == null)
+                throw new RuntimeException("ROLE_USER not found. Make sure that one exists in role table.");
+            role = roleUser;
+        }
         // attach the roles to account obj
         Set<Role> accRoles = new HashSet<>();
         accRoles.add(role);
