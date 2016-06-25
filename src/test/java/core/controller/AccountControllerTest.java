@@ -4,7 +4,9 @@ import config.PersistenceConfig;
 import config.SpringConfig;
 import config.WebConfig;
 import config.WebSecurityConfig;
+import core.TestBase;
 import core.service.EmailService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +34,7 @@ import static org.mockito.Matchers.any;
 @ContextConfiguration(classes = {PersistenceConfig.class, WebSecurityConfig.class, SpringConfig.class, WebConfig.class}, loader = AnnotationConfigWebContextLoader.class)
 @Transactional
 @WebAppConfiguration
-public class AccountControllerTest {
+public class AccountControllerTest extends TestBase {
 
 
 
@@ -42,13 +44,13 @@ public class AccountControllerTest {
     private MockMvc mockMvc;
 
     @Before
-    public void setup() throws Exception{
-
+    public void setup() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity()) // will perform all of the initial setup we need to integrate Spring Security with Spring MVC Test
                 .build();
         MockitoAnnotations.initMocks(this);
     }
+
 
     @Test
     public void test() throws Exception {
