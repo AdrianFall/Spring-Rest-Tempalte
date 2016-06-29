@@ -341,16 +341,42 @@
                         <webXml>web/WEB-INF/web.xml</webXml>
                     </configuration>
                 </plugin>
-
-
-                <!--<plugin>
-                    <groupId>org.apache.tomcat.maven</groupId>
-                    <artifactId>tomcat7-maven-plugin</artifactId>
-                    <version>2.3-SNAPSHOT</version>
-                </plugin>-->
-
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <url>http://localhost:18080/manager/text</url>
+                    <server>localhost</server>
+                    <path>/${project.build.finalName}</path>
+                    <port>18080</port>
+                    <tomcatWebXml>web/WEB-INF/web.xml</tomcatWebXml>
+                </configuration>
+                <!--<executions>
+                    <execution>
+                        <id>tomcat7:run</id>
+                        <goals>
+                            <goal>exec-war-only</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <path>/foo</path>
+                            <httpPort>18080</httpPort>
+
+                            &lt;!&ndash; optional, needed only if you want to use a preconfigured server.xml file &ndash;&gt;
+                            &lt;!&ndash;<serverXml>src/main/tomcatconf/server.xml</serverXml>&ndash;&gt;
+                            &lt;!&ndash; optional values which can be configurable &ndash;&gt;
+                            &lt;!&ndash;<attachArtifactClassifier>default value is exec-war but you can customize</attachArtifactClassifier>&ndash;&gt;
+                            &lt;!&ndash;<attachArtifactClassifierType>default value is jar</attachArtifactClassifierType>&ndash;&gt;
+                        </configuration>
+                    </execution>
+                </executions>-->
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
