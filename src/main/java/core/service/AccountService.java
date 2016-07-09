@@ -4,6 +4,7 @@ import core.model.Account;
 import core.model.PasswordResetToken;
 import core.model.Test;
 import core.model.VerificationToken;
+import core.model.dto.SocialRegistrationDTO;
 import core.service.exception.EmailExistsException;
 
 /**
@@ -24,4 +25,6 @@ public interface AccountService {
     public Test getTest(Account acc);
     public Test setTest(Account acc, String testWord);
     public boolean deleteAllAccounts();
+
+    public Account registerSocialAccount(SocialRegistrationDTO registration) throws EmailExistsException;
 }

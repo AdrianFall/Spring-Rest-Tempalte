@@ -1,6 +1,10 @@
 package core.model;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -17,6 +21,14 @@ public class Account {
     private String password;
     private String email;
     private boolean enabled;
+
+    public enum SocialMediaService {
+        FACEBOOK, TWITTER, LINKEDIN
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sign_in_provider", length = 20)
+    private SocialMediaService signInProvider;
 
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "accounts_roles",
@@ -82,6 +94,20 @@ public class Account {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public SocialMediaService getSignInProvider() {
+        return signInProvider;
+    }
+
+    public void setSignInProvider(SocialMediaService signInProvider) {
+        this.signInProvider = signInProvider;
+    }
+
+    public Set<GrantedAuthority> getAuthorities() {
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
+        accRoles.forEach(e -> grantedAuthorities.add(new SimpleGrantedAuthority(e.getRole())));
+        return grantedAuthorities;
     }
 
     /*public Set<SocialProvider> getAccSocialProviders() { return accSocialProviders; }*/

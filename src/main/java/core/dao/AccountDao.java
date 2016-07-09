@@ -15,4 +15,5 @@ public interface AccountDao {
     public Test getTest(Account acc);
     public Test setTestWord(Account acc, String testWord);
     public boolean deleteAllAccounts();
+    public Account createSocialAccount(Account acc) throws RuntimeException;
 }

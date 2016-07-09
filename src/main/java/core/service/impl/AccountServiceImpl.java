@@ -7,6 +7,7 @@ import core.model.VerificationToken;
 import core.dao.AccountDao;
 import core.dao.PasswordResetTokenDao;
 import core.dao.VerificationTokenDao;
+import core.model.dto.SocialRegistrationDTO;
 import core.service.AccountService;
 import core.service.exception.EmailExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 /**
  * Created by Adrian on 10/05/2015.
@@ -60,14 +63,26 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account createAccount(Account acc) throws EmailExistsException {
-        if (accountDao.findAccountByEmail(acc.getEmail()) != null) {
+        if (accountDao.findAccountByEmail(acc.getEmail()) != null)
             throw new EmailExistsException("Email already exists.");
-        }
+
 
         // Hash the password
         acc.setPassword(passwordEncoder.encode(acc.getPassword()));
 
         return accountDao.createAccount(acc);
+    }
+
+    @Override
+    public Account registerSocialAccount(SocialRegistrationDTO registration) throws EmailExistsException {
+        if (accountDao.findAccountByEmail(registration.getEmail()) != null)
+            throw new EmailExistsException("Email already exists");
+
+        String encodedPassword = passwordEncoder.encode((registration.getPassword() != null ? registration.getPassword() : UUID.randomUUID().toString()));
+
+        Account newAccount = new Account(registration.getEmail(), encodedPassword);
+
+        return accountDao.createSocialAccount(newAccount);
     }
 
     @Override
@@ -103,7 +118,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public PasswordResetToken createPasswordResetToken(Account acc, String token) {
-        return passwordResetRepo.createPasswordResetToken(new PasswordResetToken(token,acc));
+        return passwordResetRepo.createPasswordResetToken(new PasswordResetToken(token, acc));
     }
 
     @Override
@@ -116,5 +131,4 @@ public class AccountServiceImpl implements AccountService {
         Account acc = findAccount(email);
         return (acc == null) ? null : passwordResetRepo.findCurrentPasswordResetTokenOfAccount(acc);
     }
-
 }

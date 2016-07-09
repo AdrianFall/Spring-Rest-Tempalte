@@ -34,7 +34,7 @@ public class CORSFilter implements Filter {
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Expose-Headers", "error");
         chain.doFilter(req, res);
-    }
+     }
 
     @Override
     public void destroy() {

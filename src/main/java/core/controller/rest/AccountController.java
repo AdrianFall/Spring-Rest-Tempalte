@@ -40,4 +40,12 @@ public class AccountController {
         jsonResponse.put("deleted", (accountService.deleteAllAccounts()) ? true : false);
         return jsonResponse.toString();
     }
+
+    @RequestMapping(value= "api/user/facebook/login")
+    public String facebookTest(Principal user) {
+
+        System.out.println("VICTORY");
+
+        return "success";
+    }
 }

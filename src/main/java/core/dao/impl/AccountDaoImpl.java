@@ -57,6 +57,29 @@ public class AccountDaoImpl implements AccountDao {
     }
 
     @Override
+    public Account createSocialAccount(Account acc) throws RuntimeException {
+        // Find the user role
+        Role role = (Role) sessionFactory.getCurrentSession()
+                .createCriteria(Role.class)
+                .add(Restrictions.eq("role", "ROLE_REST_SOCIAL"))
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).uniqueResult();
+        if (role == null)
+            throw new RuntimeException("ROLE_REST_SOCIAL not found. Make sure that one exists in role table.");
+
+        // attach the roles to account obj
+        Set<Role> accRoles = new HashSet<>();
+        accRoles.add(role);
+        acc.setAccRoles(accRoles);
+
+        // create the new acc
+        sessionFactory.getCurrentSession()
+                .save(acc);
+        sessionFactory.getCurrentSession().flush();
+
+        return acc;
+    }
+
+    @Override
     public Account createAccount(Account acc) throws RuntimeException {
 
         // Find the user role
