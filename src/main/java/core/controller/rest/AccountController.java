@@ -41,7 +41,7 @@ public class AccountController {
         return jsonResponse.toString();
     }
 
-    @RequestMapping(value= "api/user/facebook/login")
+    @RequestMapping(value= "social/facebook/login")
     public String facebookTest(Principal user) {
 
         System.out.println("VICTORY");

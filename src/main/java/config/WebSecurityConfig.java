@@ -13,6 +13,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -159,6 +160,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 // @formatter:off
@@ -166,10 +168,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(corsFilter(), BasicAuthenticationFilter.class)
                 .exceptionHandling().authenticationEntryPoint(basicAuthenticationEntryPoint())
                 .and()
-                .addFilterAfter(facebookTokenAuthenticationFilter(), CORSFilter.class)
+                .addFilterAfter(facebookTokenAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .sessionManagement().enableSessionUrlRewriting(false).sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/api/*").permitAll()
+                .and()
+                .authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/social/*").permitAll()
                 .and()
                 .authorizeRequests().antMatchers("/api/*").authenticated()
                 .and()

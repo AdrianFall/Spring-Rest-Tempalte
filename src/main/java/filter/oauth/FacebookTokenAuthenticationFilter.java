@@ -59,7 +59,6 @@ public class FacebookTokenAuthenticationFilter extends AbstractAuthenticationPro
     @Autowired
     private AccountService service;
 
-
     public FacebookTokenAuthenticationFilter(AuthenticationManager authManager, UserIdSource userIdSource,
                                              UsersConnectionRepository usersConnectionRepository,
                                              SocialAuthenticationServiceLocator authServiceLocator) {
@@ -85,8 +84,24 @@ public class FacebookTokenAuthenticationFilter extends AbstractAuthenticationPro
         return authServiceLocator;
     }
 
+    @Override
+    protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        String path = ((HttpServletRequest) request).getRequestURI();
+        if (request.getMethod().equals("OPTIONS") && request.getParameter("input_token") != null) {
+//            setContinueChainBeforeSuccessfulAuthentication(true);
+            return false;
+        }
+        else if (SecurityContextHolder.getContext().getAuthentication() != null && SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
+            return false;
+        else if (!path.startsWith("/social/"))
+            return false;
+
+        return true;
+    }
+
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
+        String path = ((HttpServletRequest) request).getRequestURI();
 
         Authentication auth = null;
         Set<String> authProviders = authServiceLocator.registeredProviderIds(); /*registeredAuthenticationProviderIds();*/
@@ -110,11 +125,6 @@ public class FacebookTokenAuthenticationFilter extends AbstractAuthenticationPro
                                             Authentication authResult) throws IOException, ServletException {
         super.successfulAuthentication(request, response, chain, authResult);
         chain.doFilter(request, response);
-    }
-
-    @Deprecated
-    protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
-        return true;
     }
 
     protected Connection<?> addConnection(SocialAuthenticationService<?> authService, String userId,
